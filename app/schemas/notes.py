@@ -1,16 +1,29 @@
-from pydantic import BaseModel,Field,ConfigDict
+from pydantic import BaseModel,Field,ConfigDict,BeforeValidator
 from pydantic.functional_serializers import PlainSerializer
 from datetime import datetime
 from enum import Enum
 from typing import Annotated
 from bson import ObjectId
+from app.schemas.types.custom import PyObjectId as PyID
+
+'''def validate_object_id(value:str|ObjectId)->ObjectId:
+
+    if isinstance(value, ObjectId):
+        return value
+
+    if not ObjectId.is_valid(value):
+        raise ValueError("Invalid ObjectId")
+
+    return ObjectId(value)'''
 
 
 Title=Annotated[str,Field(min_length=1,max_length=50)]
 Body=Annotated[str,Field(min_length=1,max_length=500)]
 Tags=Annotated[list[str],Field()]
 
-PyID=Annotated[ObjectId,PlainSerializer(str,return_type=str)]
+'''PyID=Annotated[ObjectId,
+               BeforeValidator(validate_object_id),
+               PlainSerializer(str,return_type=str)]'''
 
 class Status(str,Enum):
     DRAFT='draft'

@@ -9,7 +9,10 @@ from datetime import datetime,timezone,timedelta
 from app.db.database import db
 
 
-from config import settings
+from app.core.config import settings
+
+
+
 SECRET_KEY=settings.SECRET_KEY
 ALGORITHM=settings.ALGORITHM
 ACCESS_TOKEN_EXPIRY=settings.ACCESS_TOKEN_EXPIRE_MINUTES

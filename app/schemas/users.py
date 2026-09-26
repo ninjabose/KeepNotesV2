@@ -1,19 +1,30 @@
-from pydantic import BaseModel,Field,EmailStr,ConfigDict,field_validator
+from pydantic import BaseModel,Field,EmailStr,ConfigDict,field_validator,BeforeValidator
 from datetime import date,datetime
 import re
 from enum import Enum
 from typing import Annotated
 from pydantic.functional_serializers import PlainSerializer
 from bson import ObjectId
+from app.schemas.types.custom import PyObjectId as PyObjectID
+
+'''def validate_object_id(value:str|ObjectId)->ObjectId:
+
+    if isinstance(value, ObjectId):
+        return value
+
+    if not ObjectId.is_valid(value):
+        raise ValueError("Invalid ObjectId")
+
+    return ObjectId(value)'''
 
 
 
 
-
-
-PyObjectID=Annotated[
-    ObjectId,PlainSerializer(str,return_type=str)
-    ]
+'''PyObjectID=Annotated[
+    ObjectId,
+    BeforeValidator(validate_object_id),
+    PlainSerializer(str,return_type=str)
+    ]'''
 
 Username=Annotated[
     str,Field(min_length=3,max_length=50)
@@ -30,7 +41,7 @@ class UserCreate(BaseModel):
     name:str=Field(min_length=2,max_length=128)
     email:EmailStr
     password:str=Field(min_length=6,max_length=128)
-    dob:date
+    dob:datetime
     sex:Sex
 
     model_config=ConfigDict(extra='forbid')
@@ -80,7 +91,7 @@ class UserUpdate(BaseModel):
 
 class ChangeUsername(BaseModel):
     new_username:Username
-    @field_validator('username',mode='before')
+    @field_validator('new_username',mode='before')
     @classmethod
     def validate_username(cls,value):
         if not isinstance(value, str):
@@ -97,7 +108,7 @@ class ChangePassword(BaseModel):
     old_password:str
     new_password:str=Field(min_length=6,max_length=128)
 
-    @field_validator('password',mode='after')
+    @field_validator('new_password',mode='after')
     @classmethod
     def validate_password(cls,value):
         if not value.strip():
