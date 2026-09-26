@@ -114,7 +114,23 @@ async def get_notes(
     all_notes=await cursor.to_list(length=limit)
 
     return all_notes
-    
+
+@router.delete('/{note_id}',status_code=204)
+async def delete_note(note_id:str,user:dict=Depends(get_current_user)):
+    try:
+        note_obj_id=ObjectId(note_id)
+    except TypeError:
+        raise HTTPException(
+            status_code=400,
+            detail='Bad request'
+        )
+    query={'_id':note_obj_id,'owner_id':user['_id']}
+    delete=await db.notes.find_one_and_delete(query)
+    if not delete:
+        raise HTTPException(
+            status_code=404,
+            detail='Note not found'
+        )
 
 
 

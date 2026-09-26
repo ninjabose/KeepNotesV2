@@ -53,6 +53,7 @@ class ResponseNote(BaseModel):
 
     author_id:PyID
 
+
 class EditNote(BaseModel):
 
     title:Title|None=None
