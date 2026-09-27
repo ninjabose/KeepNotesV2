@@ -3,6 +3,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from pymongo import ReturnDocument
 from pymongo.errors import DuplicateKeyError
+from datetime import datetime,tzinfo,timezone
 
 
 
@@ -37,6 +38,10 @@ def renew_access_token(refresh_token:RefreshToken):
 async def user_signup(user_input:UserCreate):
     user= user_input.model_dump(exclude_unset=True)
     user['hashed_password']=hash_password(user.pop('password'))
+    user['dob']=datetime.combine(user['dob'],datetime.min.time(),tzinfo=timezone.utc)
+    time=datetime.now(timezone.utc)
+    user['created_at']=time
+    user['updated_at']=time
     try:
         result=await db.users.insert_one(user)
     except DuplicateKeyError:
@@ -74,7 +79,12 @@ async def user_login(user_input:OAuth2PasswordRequestForm=Depends()):
 
 @router.patch('/',response_model=UserResponse)
 async def user_edit(user_input:UserUpdate,user:dict=Depends(get_current_user)):
+    if modified_user.get('dob') is not None:
+         modified_user['dob']=datetime.combine(user['dob'],datetime.min.time(),tzinfo=timezone.utc)
+
+         
     modified_user=user_input.model_dump(exclude_unset=True)
+    modified_user['updated_at']=datetime.now(timezone.utc)
     query={'_id':user['_id']}
     result=await db.users.find_one_and_update(
          query,
