@@ -4,6 +4,7 @@ from app.db.database import client
 
 from app.routes.users import router as user_router
 from app.routes.notes import router as notes_router
+from app.routes.admin import router as admin_router
 
 
 
@@ -24,4 +25,5 @@ app= FastAPI(lifespan=lifespan)
 
 app.include_router(user_router)
 app.include_router(notes_router)
+app.include_router(admin_router)
 
