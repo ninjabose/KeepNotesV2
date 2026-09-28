@@ -5,6 +5,7 @@ from jwt.exceptions import InvalidTokenError
 from fastapi import HTTPException,Depends
 from fastapi.security import OAuth2PasswordBearer
 from datetime import datetime,timezone,timedelta
+from bson import ObjectId
 
 from app.db.database import db
 
@@ -77,16 +78,24 @@ def verify_refresh_token(token:str):
 
 #User and admin verification
 
-oauth2_scheme=OAuth2PasswordBearer(tokenUrl='user/login')
+oauth2_scheme=OAuth2PasswordBearer(tokenUrl='users/login')
 #bearer tokenxyz -> removed bearer -> tokenxyz
 
 async def get_current_user(token:str=Depends(oauth2_scheme)):
     access_token=verify_access_token(token)
     user_id=access_token.get('sub')
+
     if not user_id:
         raise HTTPException(
             status_code=401,
             detail='Authentication error'
+        )
+    try:
+        user_id=ObjectId(user_id)
+    except:
+        raise HTTPException(
+            status_code=401,
+            detail='Invalid Token'
         )
     user=await db.users.find_one({'_id':user_id})
     if not user:

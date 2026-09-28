@@ -19,11 +19,12 @@ logger=logging.getLogger(__name__)
 @router.post('/',response_model=ResponseNote)
 async def create_note(note_input:CreateNote,user:dict=Depends(get_current_user)):
     note=note_input.model_dump()
+    now=datetime.now(timezone.utc)
     note.update(
         {
             'author_id':user['_id'],
-            'created_at': datetime.now(timezone.utc),
-            'updated_at':datetime.now(timezone.utc)
+            'created_at': now,
+            'updated_at':now
         }
     )
     try:
@@ -124,7 +125,7 @@ async def delete_note(note_id:str,user:dict=Depends(get_current_user)):
             status_code=400,
             detail='Bad request'
         )
-    query={'_id':note_obj_id,'owner_id':user['_id']}
+    query={'_id':note_obj_id,'author_id':user['_id']}
     delete=await db.notes.find_one_and_delete(query)
     if not delete:
         raise HTTPException(
