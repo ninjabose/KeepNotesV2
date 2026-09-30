@@ -66,6 +66,10 @@ class ResponseNote(BaseModel):
 
     author_id:PyID
 
+class FeedResponse(BaseModel):
+    items: list[ResponseNote]
+    next_cursor: str | None = None
+
 
 class EditNote(BaseModel):
 

@@ -11,6 +11,7 @@ import uuid
 from app.routes.users import router as user_router
 from app.routes.notes import router as notes_router
 from app.routes.admin import router as admin_router
+from app.routes.feed  import router as feed_router
 
 
 
@@ -66,4 +67,5 @@ async def request_id_logger(request:Request,call_next):
 app.include_router(user_router)
 app.include_router(notes_router)
 app.include_router(admin_router)
+app.include_router(feed_router)
 

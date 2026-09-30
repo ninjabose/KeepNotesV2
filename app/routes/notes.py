@@ -9,7 +9,8 @@ import re
 
 from app.db.database import db
 from app.core.security import get_current_user
-from app.schemas.notes import CreateNote,ResponseNote,EditNote
+from app.schemas.notes import CreateNote,ResponseNote,EditNote,Visibility,Status
+
 
 
 router=APIRouter(prefix='/notes',tags=['notes'])
@@ -74,6 +75,8 @@ async def edit_note(note_id:str,note_input:EditNote,user:dict=Depends(get_curren
 async def get_notes(
     user:dict=Depends(get_current_user),
     search:str|None=None,
+    visibility:Visibility|None=None,
+    status:Status|None=None,
     filter_year:int|None=None,
     sort:Literal['-time','time']='-time',
     page:int=Query(1,ge=1),
@@ -81,6 +84,14 @@ async def get_notes(
 
     #USER ID
     query={'author_id':user['_id']}
+
+    #VISIBILITY
+    if visibility:
+        query['visibility']=visibility.value
+
+    #STATUS
+    if status:
+        query['status']=status.value
 
     #SEARCH
     if search:
